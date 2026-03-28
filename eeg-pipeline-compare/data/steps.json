@@ -1,0 +1,12 @@
+# all existing preprocessing steps
+
+
+cleaning:
+    - filtering
+    - ...
+    
+
+
+extraction:
+    -connectivity
+    -ERPs

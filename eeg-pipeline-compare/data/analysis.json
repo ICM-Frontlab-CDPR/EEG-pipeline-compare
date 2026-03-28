@@ -1,0 +1,10 @@
+# all possible type of analysis
+
+| analyse         | preprocessing spécifique  |
+| --------------- | ------------------------- |
+| ERP             | baseline, epochs strictes |
+| fréquence       | filtrage adapté           |
+| temps-fréquence | compromis temps/freq      |
+| connectivité    | nettoyage + source        |
+| source          | MRI + modèle tête         |
+| ML              | normalisation + features  |
