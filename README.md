@@ -7,8 +7,6 @@ It aims to help the standarization of EEG preprocessing steps in analyzing where
 - diverge or not (fragmentation check)
 - for good reason or not (quality check)
 
-
-
 Possible use case :
 
 - Comparison of pipelines
@@ -19,6 +17,8 @@ Possible use case :
 0- Run the pipelines that you want to compare and give the list of derivatives path.
 
 0bis - To be treated, derivatives/ (Pipelines output) has to declare a derivatives/ structure. (otherwise it will be a file comparison) Default is BIDS (to check with bids-validator ? could be integrated)
+
+derivatives should be .fif ? others ? 
 
 **1 - Define metrics of comparison**
 
