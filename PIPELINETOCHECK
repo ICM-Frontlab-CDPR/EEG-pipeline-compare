@@ -1,0 +1,173 @@
+Il n’existe pas un seul outil “magique” pour la qualité EEG : en pratique, on combine plusieurs librairies et pipelines qui évaluent **bruit, artefacts, canaux défectueux, dérives, SNR**, etc. Voici les principaux outils reconnus (du plus utilisé au plus spécialisé) 👇
+
+---
+
+# 🧠 Outils principaux pour évaluer la qualité EEG
+
+## 1. MNE-Python
+
+👉 Le plus flexible et largement utilisé
+
+**Ce que tu peux faire :**
+
+* Détection de canaux “bad”
+* Visualisation brute (très important pour QC)
+* Calcul de PSD (power spectral density)
+* Détection d’artefacts (EOG, ECG)
+* Statistiques sur le signal (variance, bruit)
+
+**+**
+
+* Très puissant et personnalisable
+* Compatible BIDS
+
+**–**
+
+* Pas un score “qualité global” prêt à l’emploi
+
+---
+
+## 2. EEGLAB
+
+👉 Standard historique sous MATLAB
+
+**Fonctionnalités QC :**
+
+* Rejet automatique d’artefacts
+* ICA pour nettoyer le signal
+* Plugins QC
+
+**+**
+
+* Très mature
+* Beaucoup de plugins
+
+**–**
+
+* Moins automatisé sans scripting
+
+---
+
+## 3. Automagic
+
+👉 Pipeline automatisé orienté qualité
+
+**Ce qu’il fait :**
+
+* Pipeline complet preprocessing + QC
+* Donne des métriques de qualité
+* Classe les datasets (bon/moyen/mauvais)
+
+**+**
+
+* Idéal pour gros datasets
+* Automatisation forte
+
+---
+
+## 4. HAPPE
+
+👉 Spécialisé EEG bruité (enfants, clinique)
+
+**Features :**
+
+* Nettoyage agressif
+* Métriques de qualité post-processing
+
+---
+
+## 5. PREP pipeline
+
+👉 Focus sur robustesse du signal
+
+**Inclut :**
+
+* Détection de mauvais canaux
+* Re-referencing robuste
+* Line noise removal
+
+---
+
+## 6. pyPREP
+
+👉 Version Python du PREP pipeline
+
+👉 Très pratique si tu es déjà sur MNE
+
+---
+
+## 7. NeuroKit2
+
+👉 Plus simple, multi-signaux
+
+**Peut faire :**
+
+* QC de base EEG
+* Détection d’artefacts simple
+
+---
+
+# 📊 Métriques typiques de qualité EEG
+
+Quel que soit l’outil, on regarde généralement :
+
+### 🔹 Signal
+
+* Variance / amplitude anormale
+* Flat channels
+* Saturation
+
+### 🔹 Bruit
+
+* Line noise (50 Hz en Europe)
+* High-frequency noise
+
+### 🔹 Artefacts
+
+* Clignements (EOG)
+* Activité musculaire (EMG)
+* Mouvement
+
+### 🔹 Spectre
+
+* PSD cohérente (alpha visible en repos)
+* Pas de domination de bruit
+
+### 🔹 Canaux
+
+* % de canaux rejetés
+* Corrélation inter-canaux
+
+---
+
+# 🧪 Bon workflow (pratique)
+
+Un pipeline courant :
+
+1. Charger avec MNE-Python
+2. Passer pyPREP
+3. Calculer :
+
+   * PSD
+   * bad channels
+4. (optionnel) automatiser avec Automagic
+
+---
+
+# ⚡ Reco simple selon ton besoin
+
+* 🔬 **Recherche / contrôle fin** → MNE + pyPREP
+* 🤖 **Automatique / gros dataset** → Automagic
+* 🧒 **EEG très bruité** → HAPPE
+* 🧓 **MATLAB user** → EEGLAB
+
+---
+
+# 👉 Si tu veux aller plus loin
+
+Je peux :
+
+* te proposer un script MNE pour QC automatique
+* ou définir un **score de qualité EEG** adapté à ton dataset (très utile en BIDS)
+
+Dis-moi ton contexte (repos vs tâche, nombre de sujets, format de fichiers) 👍
