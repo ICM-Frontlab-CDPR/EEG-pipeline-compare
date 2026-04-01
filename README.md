@@ -18,13 +18,14 @@ Possible use case :
 
 0bis - To be treated, derivatives/ (Pipelines output) has to declare a derivatives/ structure. (otherwise it will be a file comparison) Default is BIDS (to check with bids-validator ? could be integrated)
 
-derivatives should be .fif ? others ? 
+derivatives should be .fif ? .eeg .vhdr ? others allowed ?  [what format are ok for connectivity / epoching ...]
 
 **1 - Define metrics of comparison**
 
 - canal rejections
 - ICA components
 - statistical properties of the signal
+- etc...
 
 **2- Define at what stage of the preprocess the comparison is made**
 
@@ -34,10 +35,9 @@ derivatives should be .fif ? others ?
 
 ### **Features**
 
-**1- Integration of a mapping between objectives and metrics**
-
-- take a standardize objective
-- 
+- automatic extracting QC metrics for all data formats BIDS-compliants
+- comparaison and vizualisation of this metrics for several derivatives/ coming from different pipelines.
+- helper for chosing correct metrics based on (analysis type, datatypes, preprocessing steps)
 
 ### **Outputs**
 
@@ -46,7 +46,13 @@ derivatives should be .fif ? others ?
 - Dual derivatives/ comparison : Visualisation of multiple metrics
 - Multiple pipeline comparison : Visualisation of one metrics
 
-**---- Long-term approch :**
+---
+
+---
+
+---
+
+ **Long-term approch :**
 
 1- Be clear about what we call an EEG preprocessing pipeline :
 
