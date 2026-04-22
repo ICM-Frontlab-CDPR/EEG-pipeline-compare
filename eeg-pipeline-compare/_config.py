@@ -16,6 +16,7 @@ class DerivativeConfig(BaseModel):
     path: Path
     bids: bool
     check_type: str  # mapped from "check-type" in YAML
+    proc: str | None = None  # e.g. "filt", "clean" — required for MBP-style derivatives
 
     @field_validator("check_type")
     @classmethod

@@ -1,7 +1,8 @@
 """Scan a derivative directory for EEG files.
 
-- BIDS datasets  → pybids BIDSLayout, queried by suffix='eeg'
-- Non-BIDS dirs  → recursive glob on known EEG extensions
+- Standard BIDS (raw)   → pybids BIDSLayout, queried by suffix='eeg'
+- MBP-style BIDS        → glob .fif filtered by proc-{proc} in filename
+- Non-BIDS dirs         → recursive glob on known EEG extensions
 """
 
 from __future__ import annotations
@@ -15,8 +16,15 @@ _NON_BIDS_EEG_EXTENSIONS = {".fif", ".vhdr", ".eeg", ".npy", ".csv", ".set", ".b
 _BIDS_EEG_EXTENSIONS = [".vhdr", ".fif", ".set", ".bdf", ".edf", ".eeg"]
 
 
-def scan_bids(root: Path) -> list[Path]:
-    """Return EEG file paths from a BIDS dataset using pybids."""
+def scan_bids(root: Path, proc: str | None = None) -> list[Path]:
+    """Return EEG file paths from a BIDS dataset.
+
+    - proc=None  → standard BIDS raw data, queried via pybids (suffix='eeg')
+    - proc=str   → MBP-style derivative, glob .fif filtered by 'proc-{proc}' in filename
+    """
+    if proc is not None:
+        return _scan_bids_proc(root, proc)
+
     from bids import BIDSLayout  # type: ignore
 
     layout = BIDSLayout(str(root), validate=False)
@@ -33,6 +41,15 @@ def scan_bids(root: Path) -> list[Path]:
             paths.append(Path(bf.path))
 
     return paths
+
+
+def _scan_bids_proc(root: Path, proc: str) -> list[Path]:
+    """Glob .fif files whose name contains 'proc-{proc}_'  (MNE-BIDS-Pipeline convention)."""
+    pattern = f"proc-{proc}_"
+    return sorted(
+        p for p in root.rglob("*.fif")
+        if pattern in p.name
+    )
 
 
 def scan_non_bids(root: Path) -> list[Path]:
@@ -59,8 +76,8 @@ def scan_non_bids(root: Path) -> list[Path]:
     return found
 
 
-def scan_derivative(root: Path, bids: bool) -> list[Path]:
+def scan_derivative(root: Path, bids: bool, proc: str | None = None) -> list[Path]:
     """Scan a derivative root and return all EEG file paths found."""
     if bids:
-        return scan_bids(root)
-    return scan_non_bids(root) #THIS MIGHT NOT EVEN EXIST !!! (or only on primary acquisition server ?)
+        return scan_bids(root, proc=proc)
+    return scan_non_bids(root)

@@ -9,3 +9,6 @@ logging.basicConfig(
 )
 
 logger = logging.getLogger("eeg-compare")
+
+
+## TODO add RICH logger
