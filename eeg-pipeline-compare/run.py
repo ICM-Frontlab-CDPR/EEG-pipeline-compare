@@ -1,31 +1,25 @@
 """Entry point: compare two EEG derivatives."""
 
+import itertools
+from pathlib import Path
+
+from _config import load_config
 from _ios import load
 from _logger import logger
 from _metrics import compute_metrics
+from _scan import scan_derivative
 from _viz import dual_derivative_figure as viz
 
-fpath1 = ""
-fpath2 = ""
+CONFIG_PATH = Path("/Users/hippolyte.dreyfus/Documents/eeg-qc/config.yaml")
+OUT_DIR = Path("/Users/hippolyte.dreyfus/Documents/eeg-qc/outputs")
 
 if __name__ == "__main__":
-    import argparse
+    cfg = load_config(CONFIG_PATH)
 
-    p = argparse.ArgumentParser(description="Compare two EEG derivatives")
-    p.add_argument("--a", default=fpath1 or None, required=not fpath1)
-    p.add_argument("--b", default=fpath2 or None, required=not fpath2)
-    p.add_argument("--out", default="result.json")
-    args = p.parse_args()
+    for deriv in cfg.derivatives:
+        logger.info("Scanning derivative '%s' (%s)…", deriv.name, deriv.path)
+        files = scan_derivative(deriv.path, bids=deriv.bids)
+        logger.info("  → %d EEG file(s) found:", len(files))
+        for f in files:
+            logger.info("    %s", f)
 
-    logger.info("Loading derivative A: %s", args.a)
-    d1 = load(args.a)
-    logger.info("Loading derivative B: %s", args.b)
-    d2 = load(args.b)
-
-    logger.info("Computing metrics…")
-    m1 = compute_metrics(d1)
-    m2 = compute_metrics(d2)
-
-    logger.info("Comparing and saving → %s", args.out)
-    viz(m1, m2, save=args.out)
-    logger.info("Done.")

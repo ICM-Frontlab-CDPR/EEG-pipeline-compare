@@ -1,4 +1,0 @@
-derivative_a: ""
-derivative_b: ""
-output: "result.json"
-sfreq: null  # override if not in file metadata
