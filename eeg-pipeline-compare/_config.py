@@ -15,17 +15,7 @@ class DerivativeConfig(BaseModel):
     name: str
     path: Path
     bids: bool
-    check_type: str  # mapped from "check-type" in YAML
     proc: str | None = None  # e.g. "filt", "clean" — required for MBP-style derivatives
-
-    @field_validator("check_type")
-    @classmethod
-    def validate_check_type(cls, v: str) -> str:
-        if v not in VALID_CHECK_TYPES:
-            raise ValueError(
-                f"Unknown check-type '{v}'. Valid values: {sorted(VALID_CHECK_TYPES)}"
-            )
-        return v
 
     @field_validator("path")
     @classmethod
@@ -38,7 +28,17 @@ class DerivativeConfig(BaseModel):
 
 
 class PipelineConfig(BaseModel):
+    check_type: str  # global metric type — applies to all derivatives
     derivatives: list[DerivativeConfig]
+
+    @field_validator("check_type")
+    @classmethod
+    def validate_check_type(cls, v: str) -> str:
+        if v not in VALID_CHECK_TYPES:
+            raise ValueError(
+                f"Unknown check-type '{v}'. Valid values: {sorted(VALID_CHECK_TYPES)}"
+            )
+        return v
 
     @model_validator(mode="after")
     def at_least_two_derivatives(self) -> "PipelineConfig":
@@ -65,9 +65,8 @@ def load_config(config_path: str | Path) -> PipelineConfig:
     if not isinstance(raw, dict):
         raise ValueError("Config file must be a YAML mapping.")
 
-    # Normalize "check-type" → "check_type" for Pydantic
-    for deriv in raw.get("derivatives", []):
-        if "check-type" in deriv:
-            deriv["check_type"] = deriv.pop("check-type")
+    # Normalize top-level "check-type" → "check_type" for Pydantic
+    if "check-type" in raw:
+        raw["check_type"] = raw.pop("check-type")
 
     return PipelineConfig.model_validate(raw)

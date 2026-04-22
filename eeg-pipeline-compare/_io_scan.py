@@ -7,7 +7,10 @@
 
 from __future__ import annotations
 
+import logging
 from pathlib import Path
+
+logger = logging.getLogger(__name__)
 
 # Extensions recognised by _ios.py
 _NON_BIDS_EEG_EXTENSIONS = {".fif", ".vhdr", ".eeg", ".npy", ".csv", ".set", ".bdf", ".edf"}
@@ -39,6 +42,7 @@ def scan_bids(root: Path, proc: str | None = None) -> list[Path]:
         if stem not in seen_stems:
             seen_stems.add(stem)
             paths.append(Path(bf.path))
+            logger.info("  found: %s", bf.path)
 
     return paths
 
@@ -46,10 +50,12 @@ def scan_bids(root: Path, proc: str | None = None) -> list[Path]:
 def _scan_bids_proc(root: Path, proc: str) -> list[Path]:
     """Glob .fif files whose name contains 'proc-{proc}_'  (MNE-BIDS-Pipeline convention)."""
     pattern = f"proc-{proc}_"
-    return sorted(
-        p for p in root.rglob("*.fif")
-        if pattern in p.name
-    )
+    paths: list[Path] = []
+    for p in sorted(root.rglob("*.fif")):
+        if pattern in p.name:
+            logger.info("  found: %s", p)
+            paths.append(p)
+    return paths
 
 
 def scan_non_bids(root: Path) -> list[Path]:
@@ -66,12 +72,14 @@ def scan_non_bids(root: Path) -> list[Path]:
             if p.suffix.lower() == ext and p.stem not in seen_stems:
                 seen_stems.add(p.stem)
                 found.append(p)
+                logger.info("  found: %s", p)
 
     # Catch any remaining extensions not in the priority list
     for p in all_files:
         if p.suffix.lower() in _NON_BIDS_EEG_EXTENSIONS and p.stem not in seen_stems:
             seen_stems.add(p.stem)
             found.append(p)
+            logger.info("  found: %s", p)
 
     return found
 

@@ -19,8 +19,6 @@ if __name__ == "__main__":
     for deriv in cfg.derivatives:  #TODO PARALLELIZATION POINT for later
         logger.info("Scanning derivative '%s' (%s)…", deriv.name, deriv.path)
         files = scan_derivative(deriv.path, bids=deriv.bids, proc=deriv.proc)
-        logger.info("  → %d EEG file(s) found:", len(files))
-        for f in files:
-            logger.info("    %s", f)
+        logger.info("  → %d EEG file(s) found", len(files))
 
 
