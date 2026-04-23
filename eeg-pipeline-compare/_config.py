@@ -9,6 +9,7 @@ from pydantic import BaseModel, field_validator, model_validator
 
 
 VALID_CHECK_TYPES = {"raw-qc"}
+VALID_AGGREGATION_TYPES = {"mean"}
 
 
 class DerivativeConfig(BaseModel):
@@ -28,7 +29,8 @@ class DerivativeConfig(BaseModel):
 
 
 class PipelineConfig(BaseModel):
-    check_type: str  # global metric type — applies to all derivatives
+    check_type: str       # global metric type — applies to all derivatives
+    aggregation_type: str  # how to aggregate per-file metrics into one row per derivative
     derivatives: list[DerivativeConfig]
 
     @field_validator("check_type")
@@ -37,6 +39,15 @@ class PipelineConfig(BaseModel):
         if v not in VALID_CHECK_TYPES:
             raise ValueError(
                 f"Unknown check-type '{v}'. Valid values: {sorted(VALID_CHECK_TYPES)}"
+            )
+        return v
+
+    @field_validator("aggregation_type")
+    @classmethod
+    def validate_aggregation_type(cls, v: str) -> str:
+        if v not in VALID_AGGREGATION_TYPES:
+            raise ValueError(
+                f"Unknown aggregation-type '{v}'. Valid values: {sorted(VALID_AGGREGATION_TYPES)}"
             )
         return v
 
@@ -65,8 +76,9 @@ def load_config(config_path: str | Path) -> PipelineConfig:
     if not isinstance(raw, dict):
         raise ValueError("Config file must be a YAML mapping.")
 
-    # Normalize top-level "check-type" → "check_type" for Pydantic
-    if "check-type" in raw:
-        raw["check_type"] = raw.pop("check-type")
+    # Normalize hyphenated keys → underscored for Pydantic
+    for hyphen_key, under_key in [("check-type", "check_type"), ("aggregation-type", "aggregation_type")]:
+        if hyphen_key in raw:
+            raw[under_key] = raw.pop(hyphen_key)
 
     return PipelineConfig.model_validate(raw)
